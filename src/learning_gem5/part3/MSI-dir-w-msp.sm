@@ -198,7 +198,7 @@ machine(MachineType:Directory, "Directory protocol")
     // in this implementation.
     // NOTE: we don't have TBE in this machine, so we don't need to pass it
     // to these overridden functions.
-    void set_mhtentry(m, Addr addr, machineID) {
+    void set_mhtentry(Message m, Addr addr, NodeID machineID) {
       if (MHTable.isPresent(addr)){
           MHTable[addr].LastMessage := m;
           MHTable[addr].Requestor := machineID
@@ -472,7 +472,7 @@ machine(MachineType:Directory, "Directory protocol")
             }
         }
     }
-    
+
 
     action(popResponseQueue, "pR", desc="Pop the response queue") {
         response_in.dequeue(clockEdge());
