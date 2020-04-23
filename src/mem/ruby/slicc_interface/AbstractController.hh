@@ -199,6 +199,7 @@ class AbstractController : public ClockedObject, public Consumer
     unsigned int m_in_ports;
     unsigned int m_cur_in_port;
     const int m_number_of_TBEs;
+    const int m_number_of_MHTEntries;
     const int m_transitions_per_cycle;
     const unsigned int m_buffer_size;
     Cycles m_recycle_latency;

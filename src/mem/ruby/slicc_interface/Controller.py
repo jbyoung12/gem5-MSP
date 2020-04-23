@@ -59,6 +59,7 @@ class RubyController(ClockedObject):
 
     recycle_latency = Param.Cycles(10, "")
     number_of_TBEs = Param.Int(256, "")
+    number_of_MHT_Entries = Param.Int(20, "")
     ruby_system = Param.RubySystem("")
 
     # This is typically a proxy to the icache/dcache hit latency.

@@ -204,6 +204,7 @@ class DirController(Directory_Controller):
         # Connect this directory to the memory side.
         self.memory = mem_ctrls[0].port
         self.connectQueues(ruby_system)
+        self.number_of_MHT_Entries = 20
 
     def connectQueues(self, ruby_system):
         self.requestFromCache = MessageBuffer(ordered = True)
