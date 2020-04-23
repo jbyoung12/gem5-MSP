@@ -123,16 +123,22 @@ machine(MachineType:Directory, "Directory protocol")
         MemAck,       desc="Ack from memory that write is complete";
     }
 
+    enumeration(Message, desc="Messages in MHT") {
+    // Data requests from the cache
+      WriteOrUpgrade,         desc="Either a write or upgrade request";
+      Read,         desc="Read request";
+    }
+
   //mhts hold pattern history tables
     // TBE is the "transaction buffer entry". This stores information needed
     // during transient states. This is *like* an MSHR. It functions as an MSHR
     // in this protocol, but the entry is also allocated for other uses.
     structure(MHTEntry, desc="Entry for block in message history table") {
-      Address Addr,           desc="address of the block"
+//      Address Addr,           desc="address of the block"
       Message LastMessage,    desc="Last message received for block";
       int Requestor,          desc="Sender of LastMessage;
 //      PHTable PHTbl,          desc="Pattern history table corresponding to this block"
-      Message PredictedMessage, desc="Prediction for next message for accuracy"
+//      Message PredictedMessage, desc="Prediction for next message for accuracy"
     }
 //
 //    structure(PHTEntry, desc="Entry for transient requests") {
@@ -162,7 +168,6 @@ machine(MachineType:Directory, "Directory protocol")
     // We also have to pass through a parameter to the machine to the TBETable.
     MHTable MHTbl, template="<Directory_MHTable>", constructor="m_number_of_MHTEntries";
 
-    void set_mhtentry(MHTEntry m);
 //    void set_phtentry(PHTEntry p);
 
 // NOTE: We use a netdest for the sharers and the owner so we can simply
@@ -193,6 +198,13 @@ machine(MachineType:Directory, "Directory protocol")
     // in this implementation.
     // NOTE: we don't have TBE in this machine, so we don't need to pass it
     // to these overridden functions.
+    void set_mhtentry(m, Addr addr, machineID) {
+      if (MHTable.isPresent(addr)){
+          MHTable[addr].LastMessage := m;
+          MHTable[addr].Requestor := machineID
+      }
+    }
+
 
     State getState(Addr addr) {
         if (directory.isPresent(addr)) {
@@ -354,8 +366,9 @@ machine(MachineType:Directory, "Directory protocol")
     action(addReqToSharers, "aS", desc="Add requestor to sharer list") {
         peek(request_in, RequestMsg) {
             getDirectoryEntry(address).Sharers.add(in_msg.Requestor);
+            set_mhtentry(Message:Read, MHTable[address], in_msg.Requestor);
         }
-    }
+}
 
     action(setOwner, "sO", desc="Set the owner") {
         peek(request_in, RequestMsg) {
@@ -460,7 +473,9 @@ machine(MachineType:Directory, "Directory protocol")
         }
     }
 
-    // Queue management
+
+scons build/X86_MSI/gem5.opt --default=X86 PROTOCOL=MSI SLICC_HTML=True
+
 
     action(popResponseQueue, "pR", desc="Pop the response queue") {
         response_in.dequeue(clockEdge());
