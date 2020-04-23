@@ -65,7 +65,7 @@ class MHTable
 
 template<class ENTRY>
 inline std::ostream&
-operator<<(std::ostream& out, const TBETable<ENTRY>& obj)
+operator<<(std::ostream& out, const MHTable<ENTRY>& obj)
 {
     obj.print(out);
     out << std::flush;
@@ -74,7 +74,7 @@ operator<<(std::ostream& out, const TBETable<ENTRY>& obj)
 
 template<class ENTRY>
 inline bool
-TBETable<ENTRY>::isPresent(Addr address) const
+MHTable<ENTRY>::isPresent(Addr address) const
 {
     assert(address < m_number_of_MHTableEntries);
     return m_array[address] != nullptr;
@@ -84,7 +84,7 @@ TBETable<ENTRY>::isPresent(Addr address) const
 // looks an address up in the cache
 template<class ENTRY>
 inline ENTRY*
-TBETable<ENTRY>::lookup(Addr address)
+MHTable<ENTRY>::lookup(Addr address)
 {
   if (address < m_number_of_MHTableEntries) return &(m_array[address]);
   return NULL;
@@ -93,8 +93,8 @@ TBETable<ENTRY>::lookup(Addr address)
 
 template<class ENTRY>
 inline void
-TBETable<ENTRY>::print(std::ostream& out) const
+MHTable<ENTRY>::print(std::ostream& out) const
 {
 }
 
-#endif // __MEM_RUBY_STRUCTURES_TBETABLE_HH__
+#endif // __MEM_RUBY_STRUCTURES_MHTABLE_HH__
