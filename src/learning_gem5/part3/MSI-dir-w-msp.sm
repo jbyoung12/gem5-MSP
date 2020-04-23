@@ -472,10 +472,7 @@ machine(MachineType:Directory, "Directory protocol")
             }
         }
     }
-
-
-scons build/X86_MSI/gem5.opt --default=X86 PROTOCOL=MSI SLICC_HTML=True
-
+    
 
     action(popResponseQueue, "pR", desc="Pop the response queue") {
         response_in.dequeue(clockEdge());
