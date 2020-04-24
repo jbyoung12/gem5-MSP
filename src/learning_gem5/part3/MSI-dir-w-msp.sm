@@ -129,17 +129,24 @@ machine(MachineType:Directory, "Directory protocol")
       Read,                   desc="Read request";
     }
 
+    // NOTE: We use a netdest for the sharers and the owner so we can simply
+    // copy the structure into the message we send as a response.
+    structure(Entry, desc="...", interface="AbstractCacheEntry", main="false") {
+      State DirState,         desc="Directory state";
+      NetDest Sharers,        desc="Sharers for this block";
+      NetDest Owner,          desc="Owner of this block";
+    }
   //mhts hold pattern history tables
     // TBE is the "transaction buffer entry". This stores information needed
     // during transient states. This is *like* an MSHR. It functions as an MSHR
     // in this protocol, but the entry is also allocated for other uses.
-//    structure(MHTEntry, desc="Entry for block in message history table") {
-////      Address Addr,           desc="address of the block";
-//      Message LastMessage,    desc="Last message received for block";
-//      int Requestor,          desc="Sender of LastMessage;
-////      PHTable PHTbl,          desc="Pattern history table corresponding to this block";
-////      Message PredictedMessage, desc="Prediction for next message for accuracy";
-//    }
+    structure(MHTEntry, desc="Entry for block in message history table") {
+//      Address Addr,           desc="address of the block";
+      Message LastMessage,    desc="Last message received for block";
+      int Requestor,          desc="Sender of LastMessage;
+//      PHTable PHTbl,          desc="Pattern history table corresponding to this block";
+//      Message PredictedMessage, desc="Prediction for next message for accuracy";
+    }
 //
 //    structure(PHTEntry, desc="Entry for transient requests") {
 //      Message Message,          desc="State of block";
@@ -148,12 +155,13 @@ machine(MachineType:Directory, "Directory protocol")
 //      int PredictedRequestor,   desc="Given message, the requestor of the next message we expect"
 //    }
 
-    // Table of MHT entries. This is defined externally in
-    // src/mem/ruby/structures/MHTable.hh. It is templatized on the MHTEntry
-    // structure defined above.
-//    structure(MHTable, external="yes") {
-//      MHTEntry lookup(Addr);
-//    }
+//     Table of MHT entries. This is defined externally in
+//     src/mem/ruby/structures/MHTable.hh. It is templatized on the MHTEntry
+//     structure defined above.
+    structure(MHTable, external="yes") {
+      MHTEntry lookup(Addr);
+      bool isPresent(Addr);
+    }
 //
 //    structure(PHTable, external="yes") {
 //      PHTEntry lookup(Message);
