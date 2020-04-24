@@ -34,11 +34,13 @@
 #define __MEM_RUBY_SLICC_INTERFACE_ABSTRACTCACHEENTRY_HH__
 
 #include <iostream>
+#include <unordered_map>
 
 #include "base/logging.hh"
 #include "mem/cache/replacement_policies/replaceable_entry.hh"
 #include "mem/ruby/common/Address.hh"
 #include "mem/ruby/protocol/AccessPermission.hh"
+#include "mem/ruby/common/MachineID.hh"
 
 class DataBlock;
 
@@ -47,6 +49,8 @@ class AbstractCacheEntry : public ReplaceableEntry
   private:
     // The last access tick for the cache entry.
     Tick m_last_touch_tick;
+    std::unordered_map<std::string,std::string> m_map; //pattern history table
+    int m_number_of_PHTEntries = 0;
 
   public:
     AbstractCacheEntry();
@@ -89,6 +93,12 @@ class AbstractCacheEntry : public ReplaceableEntry
 
     // Set the last access Tick.
     void setLastAccess(Tick tick) { m_last_touch_tick = tick; }
+
+    bool pHTIsPresent(std::string message, MachineID machineID) const;
+    void pHTAllocate(std::string message, MachineID machineID);
+    void pHTDeallocate(std::string message, MachineID machineID);
+    std::string pHTLookup(std::string message, MachineID machineID);
+    void pHTUpdate(std::string message, std::string predictedMessage, MachineID machineID, MachineID predictedMachineID);
 };
 
 inline std::ostream&

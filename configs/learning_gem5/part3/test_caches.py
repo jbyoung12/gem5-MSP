@@ -50,7 +50,7 @@ from msi_caches import L1Cache, DirController, MyNetwork
 class TestCacheSystem(RubySystem):
 
     def __init__(self):
-        if buildEnv['PROTOCOL'] != 'MSI':
+        if buildEnv['PROTOCOL'] != 'MSI' and buildEnv['PROTOCOL'] != 'MSI-MSP':
             fatal("This system assumes MSI from learning gem5!")
 
         super(TestCacheSystem, self).__init__()

@@ -125,9 +125,22 @@ machine(MachineType:Directory, "Directory protocol")
 
     enumeration(Message, desc="Messages in MHT") {
       // Data requests from the cache
-      WriteOrUpgrade,         desc="Either a write or upgrade request";
-      Read,                   desc="Read request";
+      WriteOrUpgrade, "write or upgrade",        desc="Either a write or upgrade request";
+      Read, "read",                  desc="Read request";
+      NULL, desc="neither";
     }
+
+//    structure(PHTEntry, desc="Entry for pattern history table") {
+//      Message PredictedMessage, desc="Given message, the next message we expect";
+//      MachineID PredictedRequestor,   desc="Given message, the requestor of the next message we expect";
+//    }
+//
+//    structure(PHTable, external="yes") {
+//      std::string lookup(Message);
+//      void allocate(Addr);
+//      void deallocate(Addr);
+//      bool isPresent(Addr);
+//    }
 
     // NOTE: We use a netdest for the sharers and the owner so we can simply
     // copy the structure into the message we send as a response.
@@ -135,8 +148,13 @@ machine(MachineType:Directory, "Directory protocol")
         State DirState,         desc="Directory state";
         NetDest Sharers,        desc="Sharers for this block";
         NetDest Owner,          desc="Owner of this block";
-        Message LastMessage,    desc="Last message received for this block";
+      Message LastMessage, default="Directory_Message_NULL", desc="Last message received for this block";
         MachineID Requestor,    desc="Requestor of last message received for this block";
+        std::string pHTLookup(std::string, MachineID);
+        void pHTAllocate(std::string, MachineID);
+        void pHTDeallocate(std::string, MachineID);
+        bool pHTIsPresent(std::string,  MachineID);
+        void pHTUpdate(std::string, std::string, MachineID, MachineID);
     }
 
     Tick clockEdge();
@@ -153,6 +171,27 @@ machine(MachineType:Directory, "Directory protocol")
         }
         return dir_entry;
     }
+
+    std::string messageToString(Message m){
+      if (m == Message:Read){
+        return "read";
+      } else if (m == Message:WriteOrUpgrade){
+        return "writeorupgrade";
+      } else {
+        return "neither";
+      }
+    }
+
+    std::string getPHTEntry(Entry e, Message msg, MachineID m) {
+      if (!e.pHTIsPresent(messageToString(msg), m)) {
+        // This first time we see this message, allocate an entry for it.
+        e.pHTAllocate(messageToString(msg), m);
+      }
+
+      std::string pht_entry := e.pHTLookup(messageToString(msg), m);
+      return pht_entry;
+    }
+
 
     /*************************************************************************/
     // Functions that we need to define/override to use our specific structures
@@ -193,6 +232,7 @@ machine(MachineType:Directory, "Directory protocol")
             return AccessPermission:NotPresent;
         }
     }
+
     void setAccessPermission(Addr addr, State state) {
         if (directory.isPresent(addr)) {
             Entry e := getDirectoryEntry(addr);
@@ -214,13 +254,7 @@ machine(MachineType:Directory, "Directory protocol")
     }
 
     void printMessage(std::string s, Message m) {
-      if (m == Message:Read){
-        DPRINTF(RubySlicc, "%s read\n", s);
-      } else if (m == Message:WriteOrUpgrade){
-        DPRINTF(RubySlicc, "%s write or upgrade\n", s);
-      } else {
-        DPRINTF(RubySlicc, "%s neither read nor write\n", s);
-      }
+      DPRINTF(RubySlicc, "%s %s\n", s, messageToString(m));
     }
 
     void setMHTEntry(Message m, Addr addr, MachineID machineID) {
@@ -230,6 +264,13 @@ machine(MachineType:Directory, "Directory protocol")
         Entry entry := getDirectoryEntry(addr);
         printMessage("Previous message was", entry.LastMessage);
         DPRINTF(RubySlicc, "Previous requestor was %s\n", entry.Requestor);
+        if (entry.LastMessage!=Message:NULL){
+          //should look up PTE of last message, if it equals current message, accuracy up
+          std::string phte := getPHTEntry(entry, entry.LastMessage, entry.Requestor);
+          //add accuracy with PTE comparison
+          DPRINTF(RubySlicc, "PHTE entry was %s\n", phte);
+          entry.pHTUpdate(messageToString(entry.LastMessage), messageToString(m), entry.Requestor, machineID);
+        }
         entry.LastMessage := m;
         entry.Requestor := machineID;
     }

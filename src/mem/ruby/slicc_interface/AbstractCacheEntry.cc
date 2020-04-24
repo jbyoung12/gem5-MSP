@@ -81,3 +81,42 @@ AbstractCacheEntry::isLocked(int context) const
             m_Address, m_locked, context);
     return m_locked == context;
 }
+
+bool
+AbstractCacheEntry::pHTIsPresent(std::string message, MachineID machineID) const
+{
+  return !!m_map.count(message+MachineIDToString(machineID));
+}
+
+void
+AbstractCacheEntry::pHTAllocate(std::string message, MachineID machineID)
+{
+  m_number_of_PHTEntries += 1;
+  assert(!pHTIsPresent(message, machineID));
+  m_map[message+MachineIDToString(machineID)] = "";
+}
+
+void
+AbstractCacheEntry::pHTDeallocate(std::string message, MachineID machineID)
+{
+  m_number_of_PHTEntries -= 1;
+  assert(pHTIsPresent(message, machineID));
+  assert(m_map.size() > 0);
+  m_map.erase(message+MachineIDToString(machineID));
+}
+
+// looks an address up in the cache
+std::string
+AbstractCacheEntry::pHTLookup(std::string message, MachineID machineID)
+{
+  if (m_map.find(message+MachineIDToString(machineID)) != m_map.end()) return m_map.find(message+MachineIDToString(machineID))->second;
+  return NULL;
+}
+
+void
+AbstractCacheEntry::pHTUpdate(std::string message, std::string predictedMessage, MachineID machineID, MachineID predictedMachineID){
+  assert(pHTIsPresent(message, machineID));
+  m_map[message+MachineIDToString(machineID)] = predictedMessage+MachineIDToString(predictedMachineID);
+}
+
+
