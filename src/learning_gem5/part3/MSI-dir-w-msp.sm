@@ -206,12 +206,17 @@ machine(MachineType:Directory, "Directory protocol")
     // in this implementation.
     // NOTE: we don't have TBE in this machine, so we don't need to pass it
     // to these overridden functions.
-//    void set_mhtentry(Message m, Addr addr, NodeID machineID) {
-//      if (MHTbl.isPresent(addr)){
-//        MHTbl[addr].LastMessage := m;
-//        MHTbl[addr].Requestor := machineID
-//      }
-//    }
+    void set_mhtentry(Message m, Addr addr, NodeID machineID) {
+    DPRINTF(RubySlicc, "Setting MHT Entry w address %#x\n", address);
+    DPRINTF(RubySlicc, "Machine is %s\n", machineID);
+    if (m == Message.Read){
+      DPRINTF(RubySlicc, "Message is read\n", machineID);
+    }
+      if (MHTbl.isPresent(addr)){
+        MHTbl[addr].LastMessage := m;
+        MHTbl[addr].Requestor := machineID
+      }
+    }
 
 
     State getState(Addr addr) {
@@ -374,7 +379,7 @@ machine(MachineType:Directory, "Directory protocol")
     action(addReqToSharers, "aS", desc="Add requestor to sharer list") {
         peek(request_in, RequestMsg) {
             getDirectoryEntry(address).Sharers.add(in_msg.Requestor);
-//            set_mhtentry(Message:Read, address, in_msg.Requestor);
+            set_mhtentry(Message:Read, address, in_msg.Requestor);
         }
 }
 
