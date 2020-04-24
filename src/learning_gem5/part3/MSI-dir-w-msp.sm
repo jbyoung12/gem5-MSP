@@ -213,13 +213,23 @@ machine(MachineType:Directory, "Directory protocol")
         }
     }
 
+    void printMessage(std::string s, Message m) {
+      if (m == Message:Read){
+        DPRINTF(RubySlicc, "%s read\n", s);
+      } else if (m == Message:WriteOrUpgrade){
+        DPRINTF(RubySlicc, "%s write or upgrade\n", s);
+      } else {
+        DPRINTF(RubySlicc, "%s neither read nor write\n", s);
+      }
+    }
+
     void setMHTEntry(Message m, Addr addr, MachineID machineID) {
       DPRINTF(RubySlicc, "Setting MHT Entry w address %#x\n", addr);
       DPRINTF(RubySlicc, "Machine is %s\n", machineID);
-      if (m == Message:Read){
-        DPRINTF(RubySlicc, "Message is read\n");
-      }
+      printMessage("Incoming message is", m);
         Entry entry := getDirectoryEntry(addr);
+        printMessage("Previous message was", entry.LastMessage);
+        DPRINTF(RubySlicc, "Previous requestor was %s\n", entry.Requestor);
         entry.LastMessage := m;
         entry.Requestor := machineID;
     }
