@@ -26,8 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MEM_RUBY_STRUCTURES_MHTABLE_HH__
-#define __MEM_RUBY_STRUCTURES_MHTABLE_HH__
+#ifndef __MEM_RUBY_STRUCTURES_MHTable_HH__
+#define __MEM_RUBY_STRUCTURES_MHTable_HH__
 
 #include <iostream>
 #include <unordered_map>
@@ -35,31 +35,37 @@
 #include "mem/ruby/common/Address.hh"
 
 template<class ENTRY>
-class MHTable
+class MHTable_
 {
-  public:
-    MHTable(int number_of_MHTEntries)
-        : m_number_of_MHTEntries(number_of_MHTEntries)
+public:
+    MHTable_(int number_of_MHTEntries)
+            : m_number_of_MHTEntries(number_of_MHTEntries)
     {
-      m_array.resize(number_of_MHTEntries);
     }
 
     bool isPresent(Addr address) const;
+    void allocate(Addr address);
+    void deallocate(Addr address);
+    bool
+    areNSlotsAvailable(int n, Tick current_time) const
+    {
+      return (m_number_of_MHTEntries - m_map.size()) >= n;
+    }
 
     ENTRY *lookup(Addr address);
 
     // Print cache contents
     void print(std::ostream& out) const;
 
-  private:
+private:
     // Private copy constructor and assignment operator
     MHTable(const MHTable& obj);
     MHTable& operator=(const MHTable& obj);
 
     // Data Members (m_prefix)
-    std::vector<ENTRY> m_array;
+    std::unordered_map<Addr, ENTRY> m_map;
 
-  private:
+private:
     int m_number_of_MHTEntries;
 };
 
@@ -67,26 +73,44 @@ template<class ENTRY>
 inline std::ostream&
 operator<<(std::ostream& out, const MHTable<ENTRY>& obj)
 {
-    obj.print(out);
-    out << std::flush;
-    return out;
+  obj.print(out);
+  out << std::flush;
+  return out;
 }
 
 template<class ENTRY>
 inline bool
 MHTable<ENTRY>::isPresent(Addr address) const
 {
-    assert(address < m_number_of_MHTEntries);
-    return true;
+  assert(address == makeLineAddress(address));
+  assert(m_map.size() <= );
+  return !!m_map.count(address);
 }
 
+template<class ENTRY>
+inline void
+MHTable<ENTRY>::allocate(Addr address)
+{
+  assert(!isPresent(address));
+  assert(m_map.size() < {m_number_of_MHTEntries);
+  m_map[address] = ENTRY();
+}
+
+template<class ENTRY>
+inline void
+MHTable<ENTRY>::deallocate(Addr address)
+{
+  assert(isPresent(address));
+  assert(m_map.size() > 0);
+  m_map.erase(address);
+}
 
 // looks an address up in the cache
 template<class ENTRY>
 inline ENTRY*
 MHTable<ENTRY>::lookup(Addr address)
 {
-  if (address < m_number_of_MHTEntries) return &(m_array[address]);
+  if (m_map.find(address) != m_map.end()) return &(m_map.find(address)->second);
   return NULL;
 }
 
@@ -97,4 +121,4 @@ MHTable<ENTRY>::print(std::ostream& out) const
 {
 }
 
-#endif // __MEM_RUBY_STRUCTURES_MHTABLE_HH__
+#endif // __MEM_RUBY_STRUCTURES_MHTable_HH__
