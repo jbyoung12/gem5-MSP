@@ -207,10 +207,10 @@ machine(MachineType:Directory, "Directory protocol")
     // NOTE: we don't have TBE in this machine, so we don't need to pass it
     // to these overridden functions.
     void set_mhtentry(Message m, Addr addr, NodeID machineID) {
-    DPRINTF(RubySlicc, "Setting MHT Entry w address %#x\n", address);
+    DPRINTF(RubySlicc, "Setting MHT Entry w address %#x\n", addr);
     DPRINTF(RubySlicc, "Machine is %s\n", machineID);
     if (m == Message.Read){
-      DPRINTF(RubySlicc, "Message is read\n", machineID);
+      DPRINTF(RubySlicc, "Message is read\n");
     }
       if (MHTbl.isPresent(addr)){
         MHTbl[addr].LastMessage := m;
