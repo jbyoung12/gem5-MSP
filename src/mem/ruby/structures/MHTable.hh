@@ -83,7 +83,7 @@ inline bool
 MHTable<ENTRY>::isPresent(Addr address) const
 {
   assert(address == makeLineAddress(address));
-  assert(m_map.size() <= );
+  assert(m_map.size() <= m_number_of_MHTEntries);
   return !!m_map.count(address);
 }
 
@@ -92,7 +92,7 @@ inline void
 MHTable<ENTRY>::allocate(Addr address)
 {
   assert(!isPresent(address));
-  assert(m_map.size() < {m_number_of_MHTEntries);
+  assert(m_map.size() < m_number_of_MHTEntries);
   m_map[address] = ENTRY();
 }
 
