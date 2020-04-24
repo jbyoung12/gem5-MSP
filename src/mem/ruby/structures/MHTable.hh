@@ -41,7 +41,7 @@ class MHTable
     MHTable(int number_of_MHTEntries)
         : m_number_of_MHTEntries(number_of_MHTEntries)
     {
-      m_array.resize(number_of_MHTEntries, nullptr);
+      m_array.resize(number_of_MHTEntries);
     }
 
     bool isPresent(Addr address) const;
@@ -77,7 +77,7 @@ inline bool
 MHTable<ENTRY>::isPresent(Addr address) const
 {
     assert(address < m_number_of_MHTEntries);
-    return m_array[address] != nullptr;
+    return true;
 }
 
 
