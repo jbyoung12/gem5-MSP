@@ -60,7 +60,7 @@ class MHTable
     std::vector<ENTRY> m_array;
 
   private:
-    int m_number_of_MHEntries;
+    int m_number_of_MHTEntries;
 };
 
 template<class ENTRY>
@@ -76,7 +76,7 @@ template<class ENTRY>
 inline bool
 MHTable<ENTRY>::isPresent(Addr address) const
 {
-    assert(address < m_number_of_MHTableEntries);
+    assert(address < m_number_of_MHTEntries);
     return m_array[address] != nullptr;
 }
 
@@ -86,7 +86,7 @@ template<class ENTRY>
 inline ENTRY*
 MHTable<ENTRY>::lookup(Addr address)
 {
-  if (address < m_number_of_MHTableEntries) return &(m_array[address]);
+  if (address < m_number_of_MHTEntries) return &(m_array[address]);
   return NULL;
 }
 
