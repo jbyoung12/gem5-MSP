@@ -209,7 +209,7 @@ machine(MachineType:Directory, "Directory protocol")
     void set_mhtentry(Message m, Addr addr, NodeID machineID) {
     DPRINTF(RubySlicc, "Setting MHT Entry w address %#x\n", addr);
     DPRINTF(RubySlicc, "Machine is %s\n", machineID);
-    if (m == Message.Read){
+    if (m == Message:Read){
       DPRINTF(RubySlicc, "Message is read\n");
     }
       if (MHTbl.isPresent(addr)){
