@@ -174,7 +174,7 @@ machine(MachineType:Directory, "Directory protocol")
     // NOTE: SLICC mangles names with the machine type. Thus, the TBE declared
     //       above will be L1Cache_TBE in C++.
     // We also have to pass through a parameter to the machine to the TBETable.
-//    MHTable MHTbl, template="<Directory_MHTable>", constructor="m_number_of_MHTEntries";
+    MHTable MHTbl, template="<Directory_MHTable>", constructor="m_number_of_MHTEntries";
 
 //    void set_phtentry(PHTEntry p);
 
