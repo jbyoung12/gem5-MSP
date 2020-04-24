@@ -38,7 +38,7 @@ template<class ENTRY>
 class MHTable
 {
 public:
-    MHTable_(int number_of_MHTEntries)
+    MHTable(int number_of_MHTEntries)
             : m_number_of_MHTEntries(number_of_MHTEntries)
     {
     }
