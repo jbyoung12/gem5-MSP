@@ -162,6 +162,8 @@ machine(MachineType:Directory, "Directory protocol")
 //     structure defined above.
     structure(MHTable, external="yes") {
       MHTEntry lookup(Addr);
+      void allocate(Addr);
+      void deallocate(Addr);
       bool isPresent(Addr);
     }
 //
