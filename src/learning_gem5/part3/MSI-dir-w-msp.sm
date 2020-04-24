@@ -123,13 +123,20 @@ machine(MachineType:Directory, "Directory protocol")
         MemAck,       desc="Ack from memory that write is complete";
     }
 
+    enumeration(Message, desc="Messages in MHT") {
+      // Data requests from the cache
+      WriteOrUpgrade,         desc="Either a write or upgrade request";
+      Read,                   desc="Read request";
+    }
+
     // NOTE: We use a netdest for the sharers and the owner so we can simply
     // copy the structure into the message we send as a response.
     structure(Entry, desc="...", interface="AbstractCacheEntry", main="false") {
         State DirState,         desc="Directory state";
         NetDest Sharers,        desc="Sharers for this block";
         NetDest Owner,          desc="Owner of this block";
-
+        Message LastMessage,    desc="Last message received for this block";
+        MachineID Requestor,    desc="Requestor of last message received for this block";
     }
 
     Tick clockEdge();
@@ -204,6 +211,17 @@ machine(MachineType:Directory, "Directory protocol")
         } else {
             return 0;
         }
+    }
+
+    void setMHTEntry(Message m, Addr addr, MachineID machineID) {
+      DPRINTF(RubySlicc, "Setting MHT Entry w address %#x\n", addr);
+      DPRINTF(RubySlicc, "Machine is %s\n", machineID);
+      if (m == Message:Read){
+        DPRINTF(RubySlicc, "Message is read\n");
+      }
+        Entry entry := getDirectoryEntry(addr);
+        entry.LastMessage := m;
+        entry.Requestor := machineID;
     }
 
 
@@ -313,12 +331,14 @@ machine(MachineType:Directory, "Directory protocol")
     action(addReqToSharers, "aS", desc="Add requestor to sharer list") {
         peek(request_in, RequestMsg) {
             getDirectoryEntry(address).Sharers.add(in_msg.Requestor);
+            setMHTEntry(Message:Read, address, in_msg.Requestor);
         }
     }
 
     action(setOwner, "sO", desc="Set the owner") {
         peek(request_in, RequestMsg) {
             getDirectoryEntry(address).Owner.add(in_msg.Requestor);
+            setMHTEntry(Message:WriteOrUpgrade, address, in_msg.Requestor);
         }
     }
 
