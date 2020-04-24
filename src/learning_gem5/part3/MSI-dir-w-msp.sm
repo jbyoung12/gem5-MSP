@@ -208,10 +208,12 @@ machine(MachineType:Directory, "Directory protocol")
     // Convience function to look up the cache entry.
     // Needs a pointer so it will be a reference and can be updated in actions
     MHTEntry getMHTEntry(Addr address), return_by_pointer="yes" {
-      if (is_invalid(MHTbl[address]){
+      MHTEntry mhte := MHTbl[address];
+      if (is_invalid(mhte)){
           MHTbl.allocate(address);
+          mhte := MHTbl[address];
       }
-      return MHTbl[address];
+      return mhte;
     }
 
   void set_mhtentry(MHTEntry m);

@@ -35,7 +35,7 @@
 #include "mem/ruby/common/Address.hh"
 
 template<class ENTRY>
-class MHTable_
+class MHTable
 {
 public:
     MHTable_(int number_of_MHTEntries)
