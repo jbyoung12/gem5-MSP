@@ -206,15 +206,17 @@ machine(MachineType:Directory, "Directory protocol")
     // Convience function to look up the cache entry.
     // Needs a pointer so it will be a reference and can be updated in actions
     MHTEntry getMHTEntry(Addr address), return_by_pointer="yes" {
-      return static_cast(MHTEntry, "pointer", MHTbl.lookup(address));
+      return MHTbl.lookup(address);
     }
 
-    /*************************************************************************/
+  void set_mhtentry(MHTEntry m);
+  void unset_mhtentry();
+      /*************************************************************************/
     // Functions that we need to define/override to use our specific structures
     // in this implementation.
     // NOTE: we don't have TBE in this machine, so we don't need to pass it
     // to these overridden functions.
-    void set_mhtentry(Message m, Addr addr, MachineID machineID) {
+    void set_mht_entry(Message m, Addr addr, MachineID machineID) {
     DPRINTF(RubySlicc, "Setting MHT Entry w address %#x\n", addr);
     DPRINTF(RubySlicc, "Machine is %s\n", machineID);
     if (m == Message:Read){
@@ -388,7 +390,7 @@ machine(MachineType:Directory, "Directory protocol")
     action(addReqToSharers, "aS", desc="Add requestor to sharer list") {
         peek(request_in, RequestMsg) {
             getDirectoryEntry(address).Sharers.add(in_msg.Requestor);
-            set_mhtentry(Message:Read, address, in_msg.Requestor);
+            set_mht_entry(Message:Read, address, in_msg.Requestor);
         }
 }
 
