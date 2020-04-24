@@ -213,8 +213,9 @@ machine(MachineType:Directory, "Directory protocol")
       DPRINTF(RubySlicc, "Message is read\n");
     }
       if (MHTbl.isPresent(addr)){
-        MHTbl[addr]->LastMessage := m;
-        MHTbl[addr]->Requestor := machineID;
+        MHTEntry := MHTbl[addr];
+        MHTEntry.LastMessage := m;
+        MHTEntry.Requestor := machineID;
       }
     }
 
