@@ -214,7 +214,7 @@ machine(MachineType:Directory, "Directory protocol")
     }
       if (MHTbl.isPresent(addr)){
         MHTbl[addr].LastMessage := m;
-        MHTbl[addr].Requestor := machineID
+        MHTbl[addr].Requestor := machineID;
       }
     }
 
