@@ -155,9 +155,12 @@ machine(MachineType:Directory, "Directory protocol")
         void pHTDeallocate(std::string, MachineID);
         bool pHTIsPresent(std::string,  MachineID);
         void pHTUpdate(std::string, std::string, MachineID, MachineID);
+        bool comparePHTEntryToLastMessage(std::string, MachineID, std::string);
     }
 
     Tick clockEdge();
+    int correctPredictions;
+    int totalPredictions;
 
     // This either returns the valid directory entry, or, if it hasn't been
     // allocated yet, this allocates the entry. This may save some host memory
@@ -265,10 +268,16 @@ machine(MachineType:Directory, "Directory protocol")
         printMessage("Previous message was", entry.LastMessage);
         DPRINTF(RubySlicc, "Previous requestor was %s\n", entry.Requestor);
         if (entry.LastMessage!=Message:NULL){
-          //should look up PTE of last message, if it equals current message, accuracy up
-          std::string phte := getPHTEntry(entry, entry.LastMessage, entry.Requestor);
-          //add accuracy with PTE comparison
-          DPRINTF(RubySlicc, "PHTE entry was %s\n", phte);
+          std::string phtePrediction := getPHTEntry(entry, entry.LastMessage, entry.Requestor);
+          //look up PTE of last message, if it equals current message, accuracy up
+          if (phte != ""){
+              DPRINTF(RubySlicc, "PHTE prediction was %s\n", phte);
+              totalPredictions += 1;
+              if (entry.comparePHTEntryToLastMessage(messageToString(entry.LastMessage), entry.Requestor, phtePrediction)){
+                correctPredictions+=1;
+                DPRINTF(RubySlicc, "Prediction Correct %d/%d\n", correctPredictions, totalPredictions);
+              }
+            }
           entry.pHTUpdate(messageToString(entry.LastMessage), messageToString(m), entry.Requestor, machineID);
         }
         entry.LastMessage := m;

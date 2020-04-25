@@ -99,6 +99,7 @@ class AbstractCacheEntry : public ReplaceableEntry
     void pHTDeallocate(std::string message, MachineID machineID);
     std::string pHTLookup(std::string message, MachineID machineID);
     void pHTUpdate(std::string message, std::string predictedMessage, MachineID machineID, MachineID predictedMachineID);
+    bool comparePHTEntryToLastMessage(std::string lastMessage, MachineID lastMessageMachineID, std::string pHTEntry);
 };
 
 inline std::ostream&

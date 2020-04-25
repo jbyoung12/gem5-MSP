@@ -119,4 +119,8 @@ AbstractCacheEntry::pHTUpdate(std::string message, std::string predictedMessage,
   m_map[message+MachineIDToString(machineID)] = predictedMessage+MachineIDToString(predictedMachineID);
 }
 
-
+bool
+AbstractCacheEntry::comparePHTEntries(std::string lastMessage, MachineID lastMessageMachineID, std::string pHTEntry){
+  if ((lastMessage+MachineIDToString(lastMessageMachineID)) == pHTEntry) return true;
+  return false;
+}
