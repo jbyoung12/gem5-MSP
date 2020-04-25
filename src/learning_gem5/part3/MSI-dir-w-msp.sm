@@ -159,9 +159,9 @@ machine(MachineType:Directory, "Directory protocol")
     }
 
     Tick clockEdge();
-    int correctPredictions := 0;
-    int totalPredictions := 0;
-    int totalPossible := 0;
+    int correctPredictions, default="0";
+    int totalPredictions, default="0";
+    int totalPossible, default="0";
 
     // This either returns the valid directory entry, or, if it hasn't been
     // allocated yet, this allocates the entry. This may save some host memory
