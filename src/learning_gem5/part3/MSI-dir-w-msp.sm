@@ -273,17 +273,17 @@ machine(MachineType:Directory, "Directory protocol")
           //look up PTE of last message, if it equals current message, accuracy up
           totalPossible := totalPossible+1;
           if (phtePrediction != ""){
-              DPRINTF(RubySlicc, "PHTE prediction was %s\n", phtePrediction);
+//              DPRINTF(accu, "PHTE prediction was %s\n", phtePrediction);
               totalPredictions := totalPredictions+1;
               if (entry.comparePHTEntryToLastMessage(messageToString(m), machineID, phtePrediction)){
                 correctPredictions := correctPredictions+1;
-                DPRINTF(RubySlicc, "Prediction Correct %d/%d\n", correctPredictions, totalPredictions);
+                DPRINTF(accu, "Prediction Correct %d/%d\n", correctPredictions, totalPredictions);
               } else {
-                DPRINTF(RubySlicc, "Prediction Incorrect %d/%d\n", correctPredictions, totalPredictions);
+                DPRINTF(accu, "Prediction Incorrect %d/%d\n", correctPredictions, totalPredictions);
               }
             }
           entry.pHTUpdate(messageToString(entry.LastMessage), messageToString(m), entry.Requestor, machineID);
-          DPRINTF(RubySlicc, "Total Possible %d\n", totalPossible);
+          DPRINTF(accu, "Total Possible %d\n", totalPossible);
         }
         entry.LastMessage := m;
         entry.Requestor := machineID;
