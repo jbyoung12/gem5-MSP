@@ -270,11 +270,11 @@ machine(MachineType:Directory, "Directory protocol")
         if (entry.LastMessage!=Message:NULL){
           std::string phtePrediction := getPHTEntry(entry, entry.LastMessage, entry.Requestor);
           //look up PTE of last message, if it equals current message, accuracy up
-          if (phte != ""){
-              DPRINTF(RubySlicc, "PHTE prediction was %s\n", phte);
-              totalPredictions += 1;
+          if (phtePrediction != ""){
+              DPRINTF(RubySlicc, "PHTE prediction was %s\n", phtePrediction);
+              totalPredictions := totalPredictions+1;
               if (entry.comparePHTEntryToLastMessage(messageToString(entry.LastMessage), entry.Requestor, phtePrediction)){
-                correctPredictions+=1;
+                correctPredictions := correctPredictions+1;
                 DPRINTF(RubySlicc, "Prediction Correct %d/%d\n", correctPredictions, totalPredictions);
               }
             }
