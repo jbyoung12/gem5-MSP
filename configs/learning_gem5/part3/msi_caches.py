@@ -50,7 +50,7 @@ from m5.objects import *
 class MyCacheSystem(RubySystem):
 
     def __init__(self):
-        if buildEnv['PROTOCOL'] != 'MSI' and buildEnv['PROTOCOL'] != 'MSI-MSP':
+        if buildEnv['PROTOCOL'] != 'MSI' and buildEnv['PROTOCOL'] != 'MSIMSP':
             fatal("This system assumes MSI from learning gem5!")
 
         super(MyCacheSystem, self).__init__()
