@@ -5,7 +5,7 @@ Import('*')
 # Register this protocol with gem5/SCons
 all_protocols.extend([
     'MSI',
-    'MSI-MSP'
+    'MSIMSP'
 ])
 
 # Add this directory to the search path for SLICC
