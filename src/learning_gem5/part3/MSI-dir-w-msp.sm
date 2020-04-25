@@ -161,6 +161,7 @@ machine(MachineType:Directory, "Directory protocol")
     Tick clockEdge();
     int correctPredictions := 0;
     int totalPredictions := 0;
+    int totalPossible := 0;
 
     // This either returns the valid directory entry, or, if it hasn't been
     // allocated yet, this allocates the entry. This may save some host memory
@@ -270,6 +271,7 @@ machine(MachineType:Directory, "Directory protocol")
         if (entry.LastMessage!=Message:NULL){
           std::string phtePrediction := getPHTEntry(entry, entry.LastMessage, entry.Requestor);
           //look up PTE of last message, if it equals current message, accuracy up
+          totalPossible := totalPossible+1;
           if (phtePrediction != ""){
               DPRINTF(RubySlicc, "PHTE prediction was %s\n", phtePrediction);
               totalPredictions := totalPredictions+1;
@@ -281,6 +283,7 @@ machine(MachineType:Directory, "Directory protocol")
               }
             }
           entry.pHTUpdate(messageToString(entry.LastMessage), messageToString(m), entry.Requestor, machineID);
+          DPRINTF(RubySlicc, "Total Possible %d\n", totalPossible);
         }
         entry.LastMessage := m;
         entry.Requestor := machineID;
