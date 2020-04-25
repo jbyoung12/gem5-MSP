@@ -276,6 +276,8 @@ machine(MachineType:Directory, "Directory protocol")
               if (entry.comparePHTEntryToLastMessage(messageToString(entry.LastMessage), entry.Requestor, phtePrediction)){
                 correctPredictions := correctPredictions+1;
                 DPRINTF(RubySlicc, "Prediction Correct %d/%d\n", correctPredictions, totalPredictions);
+              } else {
+                DPRINTF(RubySlicc, "Prediction Incorrect\n");
               }
             }
           entry.pHTUpdate(messageToString(entry.LastMessage), messageToString(m), entry.Requestor, machineID);
