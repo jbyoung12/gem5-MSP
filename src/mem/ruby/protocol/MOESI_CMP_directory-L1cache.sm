@@ -226,17 +226,17 @@ machine(MachineType:L1Cache, "L1 cache protocol")
   AccessPermission getAccessPermission(Addr addr) {
     TBE tbe := TBEs[addr];
     if(is_valid(tbe)) {
-      DPRINTF(RubySlicc, "%s\n", L1Cache_State_to_permission(tbe.TBEState));
+//      DPRINTF(RubySlicc, "%s\n", L1Cache_State_to_permission(tbe.TBEState));
       return L1Cache_State_to_permission(tbe.TBEState);
     }
 
     Entry cache_entry := getCacheEntry(addr);
     if(is_valid(cache_entry)) {
-      DPRINTF(RubySlicc, "%s\n", L1Cache_State_to_permission(cache_entry.CacheState));
+//      DPRINTF(RubySlicc, "%s\n", L1Cache_State_to_permission(cache_entry.CacheState));
       return L1Cache_State_to_permission(cache_entry.CacheState);
     }
 
-    DPRINTF(RubySlicc, "AccessPermission_NotPresent\n");
+//    DPRINTF(RubySlicc, "AccessPermission_NotPresent\n");
     return AccessPermission:NotPresent;
   }
 
@@ -354,7 +354,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
     if (requestNetwork_in.isReady(clockEdge())) {
       peek(requestNetwork_in, RequestMsg, block_on="addr") {
         assert(in_msg.Destination.isElement(machineID));
-        DPRINTF(RubySlicc, "L1 received: %s\n", in_msg.Type);
+//        DPRINTF(RubySlicc, "L1 received: %s\n", in_msg.Type);
 
         if (in_msg.Type == CoherenceRequestType:GETX || in_msg.Type == CoherenceRequestType:DMA_WRITE) {
           if (in_msg.Requestor == machineID && in_msg.RequestorMachine == MachineType:L1Cache) {
@@ -548,7 +548,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
           out_msg.Acks := in_msg.Acks;
           out_msg.MessageSize := MessageSizeType:Response_Data;
         }
-        DPRINTF(RubySlicc, "Sending data to L2: %#x\n", in_msg.addr);
+//        DPRINTF(RubySlicc, "Sending data to L2: %#x\n", in_msg.addr);
       }
       else {
         enqueue(responseNetwork_out, ResponseMsg, cacheResponseLatency()) {
@@ -563,7 +563,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
           out_msg.Acks := in_msg.Acks;
           out_msg.MessageSize := MessageSizeType:ResponseLocal_Data;
         }
-        DPRINTF(RubySlicc, "Sending data to L1\n");
+//        DPRINTF(RubySlicc, "Sending data to L1\n");
       }
     }
   }
@@ -584,7 +584,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
           out_msg.Acks := in_msg.Acks;
           out_msg.MessageSize := MessageSizeType:Response_Data;
         }
-        DPRINTF(RubySlicc, "Sending exclusive data to L2\n");
+//        DPRINTF(RubySlicc, "Sending exclusive data to L2\n");
       }
       else {
         enqueue(responseNetwork_out, ResponseMsg, cacheResponseLatency()) {
@@ -598,7 +598,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
           out_msg.Acks := in_msg.Acks;
           out_msg.MessageSize := MessageSizeType:ResponseLocal_Data;
         }
-        DPRINTF(RubySlicc, "Sending exclusive data to L1\n");
+//        DPRINTF(RubySlicc, "Sending exclusive data to L1\n");
       }
     }
   }
@@ -657,21 +657,21 @@ machine(MachineType:L1Cache, "L1 cache protocol")
 
   action(h_load_hit, "hd", desc="Notify sequencer the load completed.") {
     assert(is_valid(cache_entry));
-    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
     L1Dcache.setMRU(cache_entry);
     sequencer.readCallback(address, cache_entry.DataBlk);
   }
 
   action(h_ifetch_hit, "hi", desc="Notify the sequencer about ifetch completion.") {
     assert(is_valid(cache_entry));
-    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
     L1Icache.setMRU(cache_entry);
     sequencer.readCallback(address, cache_entry.DataBlk);
   }
 
   action(hx_load_hit, "hx", desc="Notify sequencer the load completed.") {
     assert(is_valid(cache_entry));
-    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
     L1Icache.setMRU(address);
     L1Dcache.setMRU(address);
     sequencer.readCallback(address, cache_entry.DataBlk, true);
@@ -679,7 +679,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
 
   action(hh_store_hit, "\h", desc="Notify sequencer that store completed.") {
     assert(is_valid(cache_entry));
-    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
     L1Dcache.setMRU(cache_entry);
     sequencer.writeCallback(address, cache_entry.DataBlk);
     cache_entry.Dirty := true;
@@ -687,7 +687,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
 
   action(xx_store_hit, "\xx", desc="Notify sequencer that store completed.") {
     assert(is_valid(cache_entry));
-    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "%s\n", cache_entry.DataBlk);
     L1Icache.setMRU(address);
     L1Dcache.setMRU(address);
     sequencer.writeCallback(address, cache_entry.DataBlk, true);
@@ -722,7 +722,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
   action(m_decrementNumberOfMessages, "m", desc="Decrement the number of messages for which we're waiting") {
     peek(responseToL1Cache_in, ResponseMsg) {
       assert(is_valid(tbe));
-      DPRINTF(RubySlicc, "L1 decrementNumberOfMessages: %d\n", in_msg.Acks);
+//      DPRINTF(RubySlicc, "L1 decrementNumberOfMessages: %d\n", in_msg.Acks);
       tbe.NumPendingMsgs := tbe.NumPendingMsgs - in_msg.Acks;
     }
   }
@@ -897,7 +897,7 @@ machine(MachineType:L1Cache, "L1 cache protocol")
 
   action(forward_eviction_to_cpu, "\cc", desc="sends eviction information to the processor") {
     if (send_evictions) {
-      DPRINTF(RubySlicc, "Sending invalidation for %#x to the CPU\n", address);
+//      DPRINTF(RubySlicc, "Sending invalidation for %#x to the CPU\n", address);
       sequencer.evictionCallback(address);
     }
   }

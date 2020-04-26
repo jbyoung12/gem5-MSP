@@ -545,17 +545,17 @@ machine(MachineType:L2Cache, "Token protocol")
   AccessPermission getAccessPermission(Addr addr) {
     TBE tbe := TBEs[addr];
     if(is_valid(tbe)) {
-      DPRINTF(RubySlicc, "%s\n", L2Cache_State_to_permission(tbe.TBEState));
+//      DPRINTF(RubySlicc, "%s\n", L2Cache_State_to_permission(tbe.TBEState));
       return L2Cache_State_to_permission(tbe.TBEState);
     }
 
     Entry cache_entry := getCacheEntry(addr);
     if(is_valid(cache_entry)) {
-      DPRINTF(RubySlicc, "%s\n", L2Cache_State_to_permission(cache_entry.CacheState));
+//      DPRINTF(RubySlicc, "%s\n", L2Cache_State_to_permission(cache_entry.CacheState));
       return L2Cache_State_to_permission(cache_entry.CacheState);
     }
 
-    DPRINTF(RubySlicc, "AccessPermission_NotPresent\n");
+//    DPRINTF(RubySlicc, "AccessPermission_NotPresent\n");
     return AccessPermission:NotPresent;
   }
 
@@ -633,7 +633,7 @@ machine(MachineType:L2Cache, "Token protocol")
           trigger(Event:Data_Exclusive, in_msg.addr,
                   getCacheEntry(in_msg.addr), TBEs[in_msg.addr]);
         } else if (in_msg.Type == CoherenceResponseType:UNBLOCK) {
-          DPRINTF(RubySlicc, "Received Unblock from L1 addr: %x\n", in_msg.addr);
+//          DPRINTF(RubySlicc, "Received Unblock from L1 addr: %x\n", in_msg.addr);
           trigger(Event:Unblock, in_msg.addr,
                   getCacheEntry(in_msg.addr), TBEs[in_msg.addr]);
         } else if (in_msg.Type == CoherenceResponseType:UNBLOCK_EXCLUSIVE) {
@@ -818,8 +818,8 @@ machine(MachineType:L2Cache, "Token protocol")
       out_msg.Dirty := false;
       out_msg.MessageSize := MessageSizeType:Response_Data;
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, tbe.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, tbe.DataBlk);
   }
 
   action(c_sendDataFromTBEToL1GETX, "\c", desc="Send data from TBE to L1 requestors in TBE") {
@@ -835,8 +835,8 @@ machine(MachineType:L2Cache, "Token protocol")
       out_msg.Acks := tbe.Local_GETX_IntAcks;
       out_msg.MessageSize := MessageSizeType:Response_Data;
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, tbe.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, tbe.DataBlk);
   }
 
   action(c_sendExclusiveDataFromTBEToL1GETS, "\cc", desc="Send data from TBE to L1 requestors in TBE") {
@@ -885,8 +885,8 @@ machine(MachineType:L2Cache, "Token protocol")
         out_msg.MessageSize := MessageSizeType:Response_Data;
       }
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, tbe.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, tbe.DataBlk);
   }
 
   action(c_sendDataFromTBEToFwdGETS, "ccc", desc="Send data from TBE to external GETX") {
@@ -904,8 +904,8 @@ machine(MachineType:L2Cache, "Token protocol")
       out_msg.Acks := tbe.Fwd_GETX_ExtAcks;
       out_msg.MessageSize := MessageSizeType:Response_Data;
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, tbe.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, tbe.DataBlk);
   }
 
   action(c_sendExclusiveDataFromTBEToFwdGETS, "\ccc", desc="Send data from TBE to external GETX") {
@@ -921,8 +921,8 @@ machine(MachineType:L2Cache, "Token protocol")
       out_msg.Acks := tbe.Fwd_GETX_ExtAcks;
       out_msg.MessageSize := MessageSizeType:Response_Data;
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, tbe.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, tbe.DataBlk);
   }
 
   action(d_sendDataToL1GETS, "d", desc="Send data directly to L1 requestor") {
@@ -941,8 +941,8 @@ machine(MachineType:L2Cache, "Token protocol")
         out_msg.MessageSize := MessageSizeType:ResponseL2hit_Data;
       }
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, cache_entry.DataBlk);
   }
 
   action(d_sendDataToL1GETX, "\d", desc="Send data and a token from TBE to L1 requestor") {
@@ -961,8 +961,8 @@ machine(MachineType:L2Cache, "Token protocol")
         out_msg.Acks := tbe.Local_GETX_IntAcks;
       }
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, cache_entry.DataBlk);
   }
 
   action(dd_sendDataToFwdGETX, "dd", desc="send data") {
@@ -980,8 +980,8 @@ machine(MachineType:L2Cache, "Token protocol")
         out_msg.Acks := in_msg.Acks;
       }
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, cache_entry.DataBlk);
   }
 
 
@@ -1001,8 +1001,8 @@ machine(MachineType:L2Cache, "Token protocol")
         out_msg.MessageSize := MessageSizeType:Response_Data;
       }
     }
-    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, cache_entry.DataBlk);
+//    DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, cache_entry.DataBlk);
   }
 
   action(dd_sendExclusiveDataToFwdGETS, "\d\d", desc="send data") {
@@ -1065,12 +1065,12 @@ machine(MachineType:L2Cache, "Token protocol")
   action(ee_sendLocalInv, "\ee", desc="Send local invalidates") {
     assert(is_valid(tbe));
     tbe.NumIntPendingAcks := countLocalSharers(cache_entry, address);
-    DPRINTF(RubySlicc, "Address: %#x, Local Sharers: %s, Pending Acks: %d\n",
-            address, getLocalSharers(cache_entry, address),
-            tbe.NumIntPendingAcks);
+//    DPRINTF(RubySlicc, "Address: %#x, Local Sharers: %s, Pending Acks: %d\n",
+//            address, getLocalSharers(cache_entry, address),
+//            tbe.NumIntPendingAcks);
     if (isLocalOwnerValid(cache_entry, address)) {
       tbe.NumIntPendingAcks := tbe.NumIntPendingAcks + 1;
-      DPRINTF(RubySlicc, "%s\n", getLocalOwner(cache_entry, address));
+//      DPRINTF(RubySlicc, "%s\n", getLocalOwner(cache_entry, address));
     }
 
     enqueue( localRequestNetwork_out, RequestMsg, response_latency ) {
@@ -1518,8 +1518,8 @@ machine(MachineType:L2Cache, "Token protocol")
     peek(L1requestNetwork_in, RequestMsg) {
       assert(is_valid(cache_entry));
       cache_entry.DataBlk := in_msg.DataBlk;
-      DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, cache_entry.DataBlk);
+//      DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, cache_entry.DataBlk);
       assert(cache_entry.Dirty == false);
     }
   }
@@ -1528,8 +1528,8 @@ machine(MachineType:L2Cache, "Token protocol")
     peek(L1requestNetwork_in, RequestMsg) {
       assert(is_valid(cache_entry));
       cache_entry.DataBlk := in_msg.DataBlk;
-      DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
-            address, cache_entry.DataBlk);
+//      DPRINTF(RubySlicc, "Address: %#x, Data Block: %s\n",
+//            address, cache_entry.DataBlk);
       cache_entry.Dirty := true;
     }
   }

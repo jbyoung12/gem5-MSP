@@ -209,11 +209,11 @@ machine(MachineType:Directory, "Directory protocol")
 
   AccessPermission getAccessPermission(Addr addr) {
     if (directory.isPresent(addr)) {
-      DPRINTF(RubySlicc, "%s\n", Directory_State_to_permission(getDirectoryEntry(addr).DirectoryState));
+//      DPRINTF(RubySlicc, "%s\n", Directory_State_to_permission(getDirectoryEntry(addr).DirectoryState));
       return Directory_State_to_permission(getDirectoryEntry(addr).DirectoryState);
     }
 
-    DPRINTF(RubySlicc, "AccessPermission_NotPresent\n");
+//    DPRINTF(RubySlicc, "AccessPermission_NotPresent\n");
     return AccessPermission:NotPresent;
   }
 
@@ -378,7 +378,7 @@ void setMHTEntry(Message m, Addr addr, MachineID machineID) {
         } else if (in_msg.Type == MemoryRequestType:MEMORY_WB) {
           trigger(Event:Memory_Ack, in_msg.addr, TBEs[in_msg.addr]);
         } else {
-          DPRINTF(RubySlicc, "%s\n", in_msg.Type);
+//          DPRINTF(RubySlicc, "%s\n", in_msg.Type);
           error("Invalid message");
         }
       }
