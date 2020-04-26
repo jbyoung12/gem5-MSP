@@ -103,6 +103,13 @@ machine(MachineType:Directory, "Directory protocol")
     Data,          desc="Data to directory";
   }
 
+  enumeration(Message, desc="Messages in MHT") {
+    // Data requests from the cache
+    WriteOrUpgrade, "write or upgrade",        desc="Either a write or upgrade request";
+    Read, "read",                              desc="Read request";
+    NULL, desc="neither";
+  }
+
   // TYPES
 
   // DirectoryEntry
@@ -111,6 +118,14 @@ machine(MachineType:Directory, "Directory protocol")
     NetDest Sharers,                   desc="Sharers for this block";
     NetDest Owner,                     desc="Owner of this block";
     int WaitingUnblocks,           desc="Number of acks we're waiting for";
+    Message LastMessage, default="Directory_Message_NULL", desc="Last message received for this block";
+    MachineID Requestor,    desc="Requestor of last message received for this block";
+    std::string pHTLookup(std::string, MachineID);
+    void pHTAllocate(std::string, MachineID);
+    void pHTDeallocate(std::string, MachineID);
+    bool pHTIsPresent(std::string,  MachineID);
+    void pHTUpdate(std::string, std::string, MachineID, MachineID);
+    bool comparePHTEntryToLastMessage(std::string, MachineID, std::string);
   }
 
   structure(TBE, desc="...") {
@@ -134,6 +149,10 @@ machine(MachineType:Directory, "Directory protocol")
   Tick cyclesToTicks(Cycles c);
   void set_tbe(TBE b);
   void unset_tbe();
+
+  int correctPredictions, default="0";
+  int totalPredictions, default="0";
+  int totalPossible, default="0";
 
   Entry getDirectoryEntry(Addr addr), return_by_pointer="yes" {
     Entry dir_entry := static_cast(Entry, "pointer", directory[addr]);
@@ -233,6 +252,57 @@ machine(MachineType:Directory, "Directory protocol")
     }
     return false;
   }
+
+std::string messageToString(Message m){
+  if (m == Message:Read){
+    return "read";
+  } else if (m == Message:WriteOrUpgrade){
+    return "writeorupgrade";
+  } else {
+    return "neither";
+  }
+}
+
+std::string getPHTEntry(Entry e, Message msg, MachineID m) {
+  if (!e.pHTIsPresent(messageToString(msg), m)) {
+  // This first time we see this message, allocate an entry for it.
+    e.pHTAllocate(messageToString(msg), m);
+  }
+
+  std::string pht_entry := e.pHTLookup(messageToString(msg), m);
+  return pht_entry;
+}
+void printMessage(std::string s, Message m) {
+  DPRINTF(RubySlicc, "%s %s\n", s, messageToString(m));
+}
+
+void setMHTEntry(Message m, Addr addr, MachineID machineID) {
+  DPRINTF(RubySlicc, "Setting MHT Entry w address %#x\n", addr);
+  DPRINTF(RubySlicc, "Machine is %s\n", machineID);
+  printMessage("Incoming message is", m);
+  Entry entry := getDirectoryEntry(addr);
+  printMessage("Previous message was", entry.LastMessage);
+  DPRINTF(RubySlicc, "Previous requestor was %s\n", entry.Requestor);
+  if (entry.LastMessage!=Message:NULL){
+    std::string phtePrediction := getPHTEntry(entry, entry.LastMessage, entry.Requestor);
+    //look up PTE of last message, if it equals current message, accuracy up
+    totalPossible := totalPossible+1;
+    if (phtePrediction != ""){
+      DPRINTF(RubySlicc, "PHTE prediction was %s\n", phtePrediction);
+      totalPredictions := totalPredictions+1;
+      if (entry.comparePHTEntryToLastMessage(messageToString(m), machineID, phtePrediction)){
+        correctPredictions := correctPredictions+1;
+        DPRINTF(RubySlicc, "Prediction Correct %d/%d\n", correctPredictions, totalPredictions);
+      } else {
+        DPRINTF(RubySlicc, "Prediction Incorrect %d/%d\n", correctPredictions, totalPredictions);
+      }
+    }
+    entry.pHTUpdate(messageToString(entry.LastMessage), messageToString(m), entry.Requestor, machineID);
+    DPRINTF(RubySlicc, "Total Possible %d\n", totalPossible);
+  }
+  entry.LastMessage := m;
+  entry.Requestor := machineID;
+}
 
   // ** OUT_PORTS **
   out_port(forwardNetwork_out, RequestMsg, forwardFromDir);
@@ -394,6 +464,7 @@ machine(MachineType:Directory, "Directory protocol")
     peek(unblockNetwork_in, ResponseMsg) {
       getDirectoryEntry(address).Owner.clear();
       getDirectoryEntry(address).Owner.add(in_msg.Sender);
+      setMHTEntry(Message:WriteOrUpgrade, address, in_msg.Sender);
     }
   }
 
@@ -461,6 +532,7 @@ machine(MachineType:Directory, "Directory protocol")
   action(m_addUnlockerToSharers, "m", desc="Add the unlocker to the sharer list") {
     peek(unblockNetwork_in, ResponseMsg) {
       getDirectoryEntry(address).Sharers.add(in_msg.Sender);
+      setMHTEntry(Message:Read, address, in_msg.Sender);
     }
   }
 
