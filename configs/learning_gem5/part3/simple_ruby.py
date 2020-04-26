@@ -65,9 +65,23 @@ system.clk_domain.voltage_domain = VoltageDomain()
 # Set up the system
 system.mem_mode = 'timing'               # Use timing accesses
 system.mem_ranges = [AddrRange('512MB')] # Create an address range
+# get ISA for the binary to run.
+isa = str(m5.defines.buildEnv['TARGET_ISA']).lower()
+
+# Run application and use the compiled ISA to find the binary
+# grab the specific path to the binary
+thispath = os.path.dirname(os.path.realpath(__file__))
+binary = os.path.join(thispath, '../../../', 'tests/test-progs/stack-print/bin/',
+                      isa, 'linux/stack-print')
+print ('Number of arguments:', len(sys.argv), 'arguments.')
+print ('Argument List:', str(sys.argv))
+binary =sys.argv[1]
+print(binary)
+numcpus = int(sys.argv[2])
+print(numcpus)
 
 # Create a pair of simple CPUs
-system.cpu = [TimingSimpleCPU() for i in range(2)]
+system.cpu = [TimingSimpleCPU() for i in range(numcpus)]
 
 # Create a DDR3 memory controller and connect it to the membus
 system.mem_ctrl = DDR3_1600_8x8()
@@ -81,14 +95,7 @@ for cpu in system.cpu:
 system.caches = MyCacheSystem()
 system.caches.setup(system, system.cpu, [system.mem_ctrl])
 
-# get ISA for the binary to run.
-isa = str(m5.defines.buildEnv['TARGET_ISA']).lower()
 
-# Run application and use the compiled ISA to find the binary
-# grab the specific path to the binary
-thispath = os.path.dirname(os.path.realpath(__file__))
-binary = os.path.join(thispath, '../../../', 'tests/test-progs/threads/bin/',
-                      isa, 'linux/threads')
 
 # Create a process for a simple "multi-threaded" application
 process = Process()
